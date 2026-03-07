@@ -3,6 +3,7 @@ package com.amazon.backend.security;
 import com.amazon.backend.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -43,8 +44,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        // Allow preflight OPTIONS requests
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // Auth endpoints - public
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/products/**").permitAll()
+                        // Products - public GET
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        // Reviews - public GET only
+                        .requestMatchers(HttpMethod.GET, "/api/products/*/reviews/**").permitAll()
+                        // Health check - public
+                        .requestMatchers("/api/health").permitAll()
+                        // Everything else requires JWT:
+                        // /api/cart/**, /api/orders/**, /api/addresses/**
+                        // /api/wishlist/**, POST/PUT/DELETE on reviews
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
