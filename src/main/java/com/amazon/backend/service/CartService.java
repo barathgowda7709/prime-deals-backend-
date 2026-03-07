@@ -10,6 +10,7 @@ import com.amazon.backend.repository.ProductRepository;
 import com.amazon.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,7 @@ public class CartService {
         return buildCartResponse(cartRepository.findByUser(user));
     }
 
+    @Transactional
     public CartResponse removeFromCart(String email, Long productId) {
         User user = getUser(email);
         CartItem cartItem = cartRepository.findByUserAndProductId(user, productId)
@@ -49,6 +51,7 @@ public class CartService {
         return buildCartResponse(cartRepository.findByUser(user));
     }
 
+    @Transactional
     public void clearCart(String email) {
         User user = getUser(email);
         cartRepository.deleteByUser(user);
