@@ -43,9 +43,9 @@ public class CartService {
     }
 
     @Transactional
-    public CartResponse removeFromCart(String email, Long productId) {
+    public CartResponse removeFromCart(String email, Long cartItemId) {
         User user = getUser(email);
-        CartItem cartItem = cartRepository.findByUserAndProductId(user, productId)
+        CartItem cartItem = cartRepository.findById(cartItemId)
                 .orElseThrow(() -> new RuntimeException("Item not in cart"));
         cartRepository.delete(cartItem);
         return buildCartResponse(cartRepository.findByUser(user));

@@ -29,11 +29,11 @@ public class CartController {
         return ResponseEntity.ok(cartService.addToCart(authentication.getName(), request));
     }
 
-    @DeleteMapping("/remove/{productId}")
+    @DeleteMapping("/remove/{cartItemId}")
     public ResponseEntity<CartResponse> removeFromCart(
             Authentication authentication,
-            @PathVariable Long productId) {
-        return ResponseEntity.ok(cartService.removeFromCart(authentication.getName(), productId));
+            @PathVariable Long cartItemId) {
+        return ResponseEntity.ok(cartService.removeFromCart(authentication.getName(), cartItemId));
     }
 
     @DeleteMapping("/clear")
