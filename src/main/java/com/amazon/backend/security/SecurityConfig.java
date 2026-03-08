@@ -54,6 +54,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products/*/reviews/**").permitAll()
                         // Health check - public
                         .requestMatchers("/api/health").permitAll()
+                        // Delivery check - public
+                        .requestMatchers(HttpMethod.GET, "/api/delivery/check").permitAll()
                         .requestMatchers("/api/seller/**").authenticated()
                         .requestMatchers("/api/admin/**").authenticated()
                         // Everything else requires JWT:

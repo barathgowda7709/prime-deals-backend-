@@ -56,4 +56,25 @@ public class SellerController {
         sellerService.deleteProduct(auth.getName(), id);
         return ResponseEntity.ok("Deleted");
     }
+
+    // ─── PINCODE / DELIVERY ZONES ─────────────────────────────────────────────
+
+    @GetMapping("/pincodes")
+    public ResponseEntity<List<Map<String, Object>>> getMyPincodes(Authentication auth) {
+        return ResponseEntity.ok(sellerService.getMyPincodes(auth.getName()));
+    }
+
+    @PostMapping("/pincodes")
+    public ResponseEntity<Map<String, Object>> addPincode(
+            @RequestBody Map<String, Object> body, Authentication auth) {
+        String pincode = (String) body.get("pincode");
+        Integer deliveryDays = (Integer) body.get("deliveryDays");
+        return ResponseEntity.ok(sellerService.addPincode(auth.getName(), pincode, deliveryDays));
+    }
+
+    @DeleteMapping("/pincodes/{id}")
+    public ResponseEntity<String> deletePincode(@PathVariable Long id, Authentication auth) {
+        sellerService.deletePincode(auth.getName(), id);
+        return ResponseEntity.ok("Deleted");
+    }
 }

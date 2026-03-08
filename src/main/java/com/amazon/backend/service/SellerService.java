@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,6 +17,7 @@ public class SellerService {
     private final SellerRepository sellerRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final SellerPincodeRepository sellerPincodeRepository;
 
     private User getUser(String email) {
         return userRepository.findByEmail(email)
@@ -120,6 +122,59 @@ public class SellerService {
         if (!seller.getId().equals(p.getSellerId()))
             throw new RuntimeException("Not your product");
         productRepository.deleteById(productId);
+    }
+
+    // ─── PINCODE MANAGEMENT ──────────────────────────────────────────────────
+
+    private Seller getSeller(String email) {
+        User user = getUser(email);
+        return sellerRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Not a seller"));
+    }
+
+    public List<Map<String, Object>> getMyPincodes(String email) {
+        Seller seller = getSeller(email);
+        return sellerPincodeRepository.findBySeller(seller).stream()
+                .map(sp -> Map.<String, Object>of(
+                        "id", sp.getId(),
+                        "pincode", sp.getPincode(),
+                        "deliveryDays", sp.getDeliveryDays()))
+                .collect(Collectors.toList());
+    }
+
+    public Map<String, Object> addPincode(String email, String pincode, Integer deliveryDays) {
+        Seller seller = getSeller(email);
+        if (sellerPincodeRepository.findBySellerAndPincode(seller, pincode).isPresent())
+            throw new RuntimeException("Pincode already exists");
+        SellerPincode sp = SellerPincode.builder()
+                .seller(seller).pincode(pincode).deliveryDays(deliveryDays).build();
+        sp = sellerPincodeRepository.save(sp);
+        return Map.of("id", sp.getId(), "pincode", sp.getPincode(), "deliveryDays", sp.getDeliveryDays());
+    }
+
+    public void deletePincode(String email, Long pincodeId) {
+        Seller seller = getSeller(email);
+        SellerPincode sp = sellerPincodeRepository.findById(pincodeId)
+                .orElseThrow(() -> new RuntimeException("Pincode not found"));
+        if (!sp.getSeller().getId().equals(seller.getId()))
+            throw new RuntimeException("Not your pincode");
+        sellerPincodeRepository.deleteById(pincodeId);
+    }
+
+    // ─── DELIVERY CHECK ───────────────────────────────────────────────────────
+
+    public Map<String, Object> checkDelivery(Long productId, String pincode) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        if (product.getSellerId() == null)
+            return Map.of("deliverable", false, "message", "No seller assigned");
+
+        return sellerPincodeRepository.findBySellerIdAndPincode(product.getSellerId(), pincode)
+                .map(sp -> Map.<String, Object>of(
+                        "deliverable", true,
+                        "deliveryDays", sp.getDeliveryDays(),
+                        "message", "Delivers in " + sp.getDeliveryDays() + " day" + (sp.getDeliveryDays() == 1 ? "" : "s")))
+                .orElse(Map.of("deliverable", false, "message", "Not serviceable to this pincode"));
     }
 
     private SellerResponse toResponse(Seller s) {
