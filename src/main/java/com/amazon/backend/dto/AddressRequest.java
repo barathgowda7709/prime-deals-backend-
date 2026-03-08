@@ -1,6 +1,7 @@
 package com.amazon.backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
@@ -10,6 +11,7 @@ public class AddressRequest {
     private String fullName;
 
     @NotBlank
+    @Pattern(regexp = "^[0-9]{10}$", message = "Phone must be 10 digits")
     private String phone;
 
     @NotBlank
