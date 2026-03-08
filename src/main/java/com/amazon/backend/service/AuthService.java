@@ -2,7 +2,9 @@ package com.amazon.backend.service;
 
 import com.amazon.backend.dto.AuthResponse;
 import com.amazon.backend.dto.LoginRequest;
+import com.amazon.backend.dto.ProfileResponse;
 import com.amazon.backend.dto.RegisterRequest;
+import com.amazon.backend.dto.UpdateProfileRequest;
 import com.amazon.backend.model.Role;
 import com.amazon.backend.model.User;
 import com.amazon.backend.repository.UserRepository;
@@ -41,6 +43,31 @@ public class AuthService {
         String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
 
         return new AuthResponse(token, user.getName(), user.getRole().name(), user.getEmail());
+    }
+
+    public ProfileResponse getProfile(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return new ProfileResponse(user.getName(), user.getEmail(), user.getPhone());
+    }
+
+    public ProfileResponse updateProfile(String email, UpdateProfileRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (request.getName() != null && !request.getName().isBlank()) {
+            user.setName(request.getName());
+        }
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone());
+        }
+        if (request.getNewPassword() != null && !request.getNewPassword().isBlank()) {
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                throw new RuntimeException("Current password is incorrect");
+            }
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        }
+        userRepository.save(user);
+        return new ProfileResponse(user.getName(), user.getEmail(), user.getPhone());
     }
 
     public AuthResponse login(LoginRequest request) {

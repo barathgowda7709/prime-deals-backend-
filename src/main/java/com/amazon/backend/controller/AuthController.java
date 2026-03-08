@@ -2,11 +2,14 @@ package com.amazon.backend.controller;
 
 import com.amazon.backend.dto.AuthResponse;
 import com.amazon.backend.dto.LoginRequest;
+import com.amazon.backend.dto.ProfileResponse;
 import com.amazon.backend.dto.RegisterRequest;
+import com.amazon.backend.dto.UpdateProfileRequest;
 import com.amazon.backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,5 +30,17 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileResponse> getProfile(Authentication authentication) {
+        return ResponseEntity.ok(authService.getProfile(authentication.getName()));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<ProfileResponse> updateProfile(
+            Authentication authentication,
+            @RequestBody UpdateProfileRequest request) {
+        return ResponseEntity.ok(authService.updateProfile(authentication.getName(), request));
     }
 }

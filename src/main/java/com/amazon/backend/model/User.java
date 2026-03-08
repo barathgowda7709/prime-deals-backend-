@@ -32,6 +32,8 @@ public class User {
 
     private String address;
 
+    private String phone;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
