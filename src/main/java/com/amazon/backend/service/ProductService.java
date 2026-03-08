@@ -5,6 +5,8 @@ import com.amazon.backend.dto.ProductResponse;
 import com.amazon.backend.model.Product;
 import com.amazon.backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,8 +30,9 @@ public class ProductService {
         return mapToResponse(productRepository.save(product));
     }
 
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll()
+    public List<ProductResponse> getAllProducts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return productRepository.findAll(pageable)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -48,8 +51,9 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public List<ProductResponse> getByCategory(String category) {
-        return productRepository.findByCategory(category)
+    public List<ProductResponse> getByCategory(String category, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return productRepository.findByCategory(category, pageable)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
