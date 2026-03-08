@@ -14,6 +14,8 @@ public class OrderResponse {
     private String shippingAddress;
     private LocalDateTime createdAt;
     private List<OrderItemResponse> items;
+    private String buyerName;
+    private String buyerEmail;
 
     @Data
     public static class OrderItemResponse {

@@ -1,9 +1,13 @@
 package com.amazon.backend;
 
 import com.amazon.backend.model.Product;
+import com.amazon.backend.model.Role;
+import com.amazon.backend.model.User;
 import com.amazon.backend.repository.ProductRepository;
+import com.amazon.backend.repository.UserRepository;
 import com.github.javafaker.Faker;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -12,9 +16,15 @@ import java.util.*;
 public class DataSeeder implements CommandLineRunner {
 
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DataSeeder(ProductRepository productRepository) {
+    public DataSeeder(ProductRepository productRepository,
+                      UserRepository userRepository,
+                      PasswordEncoder passwordEncoder) {
         this.productRepository = productRepository;
+        this.userRepository    = userRepository;
+        this.passwordEncoder   = passwordEncoder;
     }
 
     // ── category config ────────────────────────────────────────────────────────
@@ -86,6 +96,18 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        // ── Seed default admin user ────────────────────────────────────────────
+        if (!userRepository.existsByEmail("admin@primedeals.com")) {
+            User admin = User.builder()
+                    .name("Admin")
+                    .email("admin@primedeals.com")
+                    .password(passwordEncoder.encode("Admin@123"))
+                    .role(Role.ADMIN)
+                    .build();
+            userRepository.save(admin);
+            System.out.println("✅ Admin user created → admin@primedeals.com / Admin@123");
+        }
+
         if (productRepository.count() >= 2000) return;
 
         Faker faker = new Faker(new Locale("en-IN"));

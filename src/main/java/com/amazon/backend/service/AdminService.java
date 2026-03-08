@@ -3,12 +3,10 @@ package com.amazon.backend.service;
 import com.amazon.backend.dto.OrderResponse;
 import com.amazon.backend.dto.ProductRequest;
 import com.amazon.backend.dto.ProductResponse;
-import com.amazon.backend.model.Order;
-import com.amazon.backend.model.OrderItem;
-import com.amazon.backend.model.OrderStatus;
-import com.amazon.backend.model.Product;
+import com.amazon.backend.model.*;
 import com.amazon.backend.repository.OrderRepository;
 import com.amazon.backend.repository.ProductRepository;
+import com.amazon.backend.repository.SellerRepository;
 import com.amazon.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +24,59 @@ public class AdminService {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
+    private final SellerRepository sellerRepository;
+
+    // ─── USERS ────────────────────────────────────────────────────────────────
+
+    public List<Map<String, Object>> getAllUsers() {
+        return userRepository.findAll().stream().map(u -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("id",        u.getId());
+            m.put("name",      u.getName());
+            m.put("email",     u.getEmail());
+            m.put("role",      u.getRole().name());
+            m.put("phone",     u.getPhone());
+            m.put("createdAt", u.getCreatedAt());
+            return m;
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    // ─── SELLERS ──────────────────────────────────────────────────────────────
+
+    public List<Map<String, Object>> getAllSellers() {
+        return sellerRepository.findAll().stream().map(s -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("id",           s.getId());
+            m.put("shopName",     s.getShopName());
+            m.put("businessType", s.getBusinessType());
+            m.put("gstNumber",    s.getGstNumber());
+            m.put("panNumber",    s.getPanNumber());
+            m.put("phone",        s.getPhone());
+            m.put("status",       s.getStatus());
+            m.put("createdAt",    s.getCreatedAt());
+            m.put("userName",     s.getUser().getName());
+            m.put("userEmail",    s.getUser().getEmail());
+            m.put("userId",       s.getUser().getId());
+            return m;
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Map<String, Object> updateSellerStatus(Long sellerId, String status) {
+        Seller seller = sellerRepository.findById(sellerId)
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
+        seller.setStatus(status);
+        sellerRepository.save(seller);
+        Map<String, Object> m = new HashMap<>();
+        m.put("id",     seller.getId());
+        m.put("status", seller.getStatus());
+        return m;
+    }
 
     // ─── PRODUCTS ─────────────────────────────────────────────────────────────
 
@@ -56,7 +107,6 @@ public class AdminService {
     public ProductResponse updateProduct(Long productId, ProductRequest request) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
@@ -64,7 +114,6 @@ public class AdminService {
         product.setCategory(request.getCategory());
         product.setImageUrl(request.getImageUrl());
         product.setStock(request.getStock());
-
         return buildProductResponse(productRepository.save(product));
     }
 
@@ -97,27 +146,26 @@ public class AdminService {
     public Map<String, Object> getDashboardStats() {
         List<Order> allOrders = orderRepository.findAll();
 
-        long totalOrders = allOrders.size();
-        double totalRevenue = allOrders.stream()
+        long totalOrders      = allOrders.size();
+        double totalRevenue   = allOrders.stream()
                 .filter(o -> o.getStatus() != OrderStatus.CANCELLED)
-                .mapToDouble(Order::getTotalPrice)
-                .sum();
-        long totalProducts = productRepository.count();
-        long totalUsers = userRepository.count();
-        long pendingOrders = allOrders.stream()
-                .filter(o -> o.getStatus() == OrderStatus.PENDING)
-                .count();
-        long deliveredOrders = allOrders.stream()
-                .filter(o -> o.getStatus() == OrderStatus.DELIVERED)
-                .count();
+                .mapToDouble(Order::getTotalPrice).sum();
+        long totalProducts    = productRepository.count();
+        long totalUsers       = userRepository.count();
+        long totalSellers     = sellerRepository.count();
+        long pendingOrders    = allOrders.stream().filter(o -> o.getStatus() == OrderStatus.PENDING).count();
+        long deliveredOrders  = allOrders.stream().filter(o -> o.getStatus() == OrderStatus.DELIVERED).count();
+        long cancelledOrders  = allOrders.stream().filter(o -> o.getStatus() == OrderStatus.CANCELLED).count();
 
         Map<String, Object> stats = new HashMap<>();
-        stats.put("totalOrders", totalOrders);
-        stats.put("totalRevenue", totalRevenue);
-        stats.put("totalProducts", totalProducts);
-        stats.put("totalUsers", totalUsers);
-        stats.put("pendingOrders", pendingOrders);
+        stats.put("totalOrders",     totalOrders);
+        stats.put("totalRevenue",    totalRevenue);
+        stats.put("totalProducts",   totalProducts);
+        stats.put("totalUsers",      totalUsers);
+        stats.put("totalSellers",    totalSellers);
+        stats.put("pendingOrders",   pendingOrders);
         stats.put("deliveredOrders", deliveredOrders);
+        stats.put("cancelledOrders", cancelledOrders);
         return stats;
     }
 
@@ -157,6 +205,12 @@ public class AdminService {
         response.setShippingAddress(order.getShippingAddress());
         response.setCreatedAt(order.getCreatedAt());
         response.setItems(itemResponses);
+
+        // include buyer info
+        if (order.getUser() != null) {
+            response.setBuyerName(order.getUser().getName());
+            response.setBuyerEmail(order.getUser().getEmail());
+        }
         return response;
     }
 }

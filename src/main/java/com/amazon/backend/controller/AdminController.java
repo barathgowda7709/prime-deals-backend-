@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -20,6 +21,40 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
+
+    // ─── DASHBOARD ────────────────────────────────────────────────────────────
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<Map<String, Object>> getDashboard() {
+        return ResponseEntity.ok(adminService.getDashboardStats());
+    }
+
+    // ─── USERS ────────────────────────────────────────────────────────────────
+
+    @GetMapping("/users")
+    public ResponseEntity<List<Map<String, Object>>> getAllUsers() {
+        return ResponseEntity.ok(adminService.getAllUsers());
+    }
+
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        adminService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ─── SELLERS ──────────────────────────────────────────────────────────────
+
+    @GetMapping("/sellers")
+    public ResponseEntity<List<Map<String, Object>>> getAllSellers() {
+        return ResponseEntity.ok(adminService.getAllSellers());
+    }
+
+    @PutMapping("/sellers/{sellerId}/status")
+    public ResponseEntity<Map<String, Object>> updateSellerStatus(
+            @PathVariable Long sellerId,
+            @RequestParam String status) {
+        return ResponseEntity.ok(adminService.updateSellerStatus(sellerId, status));
+    }
 
     // ─── PRODUCTS ─────────────────────────────────────────────────────────────
 
@@ -59,12 +94,5 @@ public class AdminController {
             @PathVariable Long orderId,
             @RequestParam OrderStatus status) {
         return ResponseEntity.ok(adminService.updateOrderStatus(orderId, status));
-    }
-
-    // ─── DASHBOARD ────────────────────────────────────────────────────────────
-
-    @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashboard() {
-        return ResponseEntity.ok(adminService.getDashboardStats());
     }
 }
