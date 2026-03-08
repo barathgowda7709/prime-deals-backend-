@@ -86,7 +86,7 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (productRepository.count() > 0) return;
+        if (productRepository.count() >= 10000) return;
 
         Faker faker = new Faker(new Locale("en-IN"));
         Random rnd = new Random();
