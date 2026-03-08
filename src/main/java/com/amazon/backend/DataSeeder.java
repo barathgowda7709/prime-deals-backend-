@@ -86,16 +86,16 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (productRepository.count() >= 10000) return;
+        if (productRepository.count() >= 2000) return;
 
         Faker faker = new Faker(new Locale("en-IN"));
         Random rnd = new Random();
-        List<Product> batch = new ArrayList<>(500);
+        List<Product> batch = new ArrayList<>(100);
         int total = 0;
         int seed = 1;
 
         for (CatConfig cat : CATS) {
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 200; i++) {
                 String brand     = cat.brands().get(rnd.nextInt(cat.brands().size()));
                 String type      = cat.types().get(rnd.nextInt(cat.types().size()));
                 String adjective = cat.adjectives().get(rnd.nextInt(cat.adjectives().size()));
@@ -128,7 +128,7 @@ public class DataSeeder implements CommandLineRunner {
                 total++;
 
                 // flush every 500 rows for performance
-                if (batch.size() == 500) {
+                if (batch.size() == 100) {
                     productRepository.saveAll(batch);
                     batch.clear();
                 }
