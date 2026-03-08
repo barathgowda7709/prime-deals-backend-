@@ -9,4 +9,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategory(String category, Pageable pageable);
     List<Product> findByCategory(String category);
     List<Product> findByNameContainingIgnoreCase(String name);
+    List<Product> findBySellerId(Long sellerId);
 }

@@ -41,6 +41,9 @@ public class Product {
     @Column(name = "num_reviews")
     private Integer numReviews = 0;
 
+    @Column(name = "seller_id")
+    private Long sellerId;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
