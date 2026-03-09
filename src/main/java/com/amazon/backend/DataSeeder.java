@@ -108,7 +108,10 @@ public class DataSeeder implements CommandLineRunner {
             System.out.println("✅ Admin user created → admin@primedeals.com / Admin@123");
         }
 
-        if (productRepository.count() >= 2000) return;
+        // ── Seed 50 premium Mobiles + 50 premium Laptops ──────────────────────
+        seedPremiumProducts();
+
+        if (productRepository.count() >= 2100) return;
 
         Faker faker = new Faker(new Locale("en-IN"));
         Random rnd = new Random();
@@ -160,5 +163,173 @@ public class DataSeeder implements CommandLineRunner {
         if (!batch.isEmpty()) productRepository.saveAll(batch);
 
         System.out.println("✅ Seeded " + total + " products across " + CATS.size() + " categories.");
+    }
+
+    // ── 50 curated Mobiles + 50 curated Laptops ────────────────────────────────
+    private void seedPremiumProducts() {
+        Random rnd = new Random(42);
+        int imgSeed = 5001;
+
+        String[] mDesc = {
+            "Featuring a stunning display and pro-grade camera system, this flagship smartphone delivers exceptional performance for work and play with lightning-fast 5G connectivity.",
+            "The latest innovation in mobile technology with advanced AI features, ultra-fast charging, and an immersive AMOLED display for an unmatched daily experience.",
+            "Capture life in stunning detail with the advanced triple-camera setup. Powered by the latest chipset for blazing-fast, lag-free performance all day long.",
+            "Slim design meets powerhouse performance. Enjoy all-day battery life with rapid charging and seamless 5G connectivity for the modern lifestyle.",
+            "Vibrant high-refresh-rate display and flagship-grade internals in a premium build. This smartphone redefines what is possible at its price point."
+        };
+
+        String[] lDesc = {
+            "Ultra-thin and lightweight powerhouse with the latest processor, stunning display, and all-day battery life — engineered for professionals who demand the best on the go.",
+            "Built for creators and gamers with a high-refresh-rate display, dedicated GPU, advanced thermal management, and a robust premium build that lasts.",
+            "Business-grade laptop with enterprise security features, MIL-SPEC durability rating, all-day battery life, and an ergonomic keyboard built for long sessions.",
+            "Immersive OLED display with factory-calibrated colours, ideal for content creators, photographers, and media professionals who need perfect accuracy.",
+            "High-performance gaming laptop featuring the latest RTX GPU, ultra-fast 165Hz display, and advanced cooling technology for competitive and creative workloads."
+        };
+
+        Object[][] mobiles = {
+            {"Apple iPhone 15 Pro Max 256GB",        "Apple",    134999.0},
+            {"Apple iPhone 15 Pro 128GB",            "Apple",    119900.0},
+            {"Apple iPhone 15 256GB",                "Apple",     79900.0},
+            {"Apple iPhone 14 128GB",                "Apple",     69900.0},
+            {"Apple iPhone 13 128GB",                "Apple",     59900.0},
+            {"Samsung Galaxy S24 Ultra 256GB",       "Samsung",  129999.0},
+            {"Samsung Galaxy S24+ 256GB",            "Samsung",   99999.0},
+            {"Samsung Galaxy S24 128GB",             "Samsung",   74999.0},
+            {"Samsung Galaxy Z Fold 6 512GB",        "Samsung",  164999.0},
+            {"Samsung Galaxy Z Flip 6 256GB",        "Samsung",  109999.0},
+            {"Samsung Galaxy A55 5G 128GB",          "Samsung",   39999.0},
+            {"Samsung Galaxy A35 5G 128GB",          "Samsung",   29999.0},
+            {"Samsung Galaxy M55 5G 128GB",          "Samsung",   27999.0},
+            {"Samsung Galaxy F55 5G 256GB",          "Samsung",   26999.0},
+            {"Samsung Galaxy A15 5G 128GB",          "Samsung",   16999.0},
+            {"OnePlus 12 5G 256GB",                  "OnePlus",   64999.0},
+            {"OnePlus 12R 5G 256GB",                 "OnePlus",   39999.0},
+            {"OnePlus Nord CE4 5G 128GB",            "OnePlus",   24999.0},
+            {"OnePlus Nord 4 5G 256GB",              "OnePlus",   29999.0},
+            {"OnePlus Nord CE3 Lite 5G 128GB",       "OnePlus",   17999.0},
+            {"Xiaomi 14 5G 512GB",                   "Xiaomi",    69999.0},
+            {"Xiaomi 13T Pro 256GB",                 "Xiaomi",    49999.0},
+            {"Xiaomi Redmi Note 13 Pro+ 5G 256GB",   "Xiaomi",    31999.0},
+            {"Xiaomi Redmi Note 13 Pro 5G 256GB",    "Xiaomi",    25999.0},
+            {"Xiaomi Poco X6 Pro 5G 256GB",          "Xiaomi",    26999.0},
+            {"Xiaomi Poco M6 Pro 5G 128GB",          "Xiaomi",    15999.0},
+            {"Xiaomi Redmi Note 13 5G 128GB",        "Xiaomi",    14999.0},
+            {"Xiaomi Redmi 13C 5G 128GB",            "Xiaomi",    10999.0},
+            {"Realme GT 6T 5G 256GB",                "Realme",    35999.0},
+            {"Realme Narzo 70 Pro 5G 256GB",         "Realme",    19999.0},
+            {"Realme 13 Pro+ 5G 256GB",              "Realme",    32999.0},
+            {"Realme C67 5G 128GB",                  "Realme",    11999.0},
+            {"Vivo X100 Pro 5G 256GB",               "Vivo",      89999.0},
+            {"Vivo V30 Pro 5G 256GB",                "Vivo",      49999.0},
+            {"Vivo V30e 5G 128GB",                   "Vivo",      29999.0},
+            {"Oppo Find X7 Ultra 5G 512GB",          "Oppo",      99999.0},
+            {"Oppo Reno 12 Pro 5G 256GB",            "Oppo",      39999.0},
+            {"Oppo A3 Pro 5G 128GB",                 "Oppo",      22999.0},
+            {"iQOO 12 5G 256GB",                     "iQOO",      52999.0},
+            {"iQOO Neo 9 Pro 5G 256GB",              "iQOO",      37999.0},
+            {"iQOO Z9 Pro 5G 256GB",                 "iQOO",      27999.0},
+            {"Nothing Phone 2a 5G 256GB",            "Nothing",   25999.0},
+            {"Nothing Phone 2 5G 256GB",             "Nothing",   44999.0},
+            {"Motorola Edge 50 Ultra 5G 512GB",      "Motorola",  59999.0},
+            {"Motorola Edge 50 Pro 5G 256GB",        "Motorola",  31999.0},
+            {"Motorola Moto G85 5G 256GB",           "Motorola",  19999.0},
+            {"Motorola G54 5G 256GB",                "Motorola",  12999.0},
+            {"Google Pixel 8 Pro 256GB",             "Google",    89999.0},
+            {"Google Pixel 8a 128GB",                "Google",    52999.0},
+            {"Samsung Galaxy A25 5G 128GB",          "Samsung",   19999.0},
+        };
+
+        Object[][] laptops = {
+            {"Apple MacBook Pro 16-inch M3 Max 36GB",              "Apple",       349900.0},
+            {"Apple MacBook Pro 14-inch M3 Pro 18GB",              "Apple",       209900.0},
+            {"Apple MacBook Air 15-inch M3 16GB",                  "Apple",       134900.0},
+            {"Apple MacBook Air 13-inch M3 8GB",                   "Apple",       114900.0},
+            {"Apple MacBook Pro 13-inch M2 8GB",                   "Apple",       129900.0},
+            {"Dell XPS 15 9530 RTX 4060",                          "Dell",        184990.0},
+            {"Dell XPS 13 9340 Intel Core Ultra 7",                "Dell",        124990.0},
+            {"Dell Alienware m18 RTX 4090",                        "Dell",        394990.0},
+            {"Dell Inspiron 15 Intel Core i5 16GB",                "Dell",         62990.0},
+            {"Dell G15 Gaming RTX 4060",                           "Dell",         96990.0},
+            {"HP Spectre x360 14 OLED Intel Core Ultra 7",         "HP",          174999.0},
+            {"HP Envy x360 15 OLED AMD Ryzen 7",                   "HP",          109999.0},
+            {"HP Pavilion 15 Intel Core i5 16GB",                  "HP",           56999.0},
+            {"HP OMEN 16 RTX 4070 Gaming",                         "HP",          149999.0},
+            {"HP Victus 16 RTX 4060 Intel Core i7",                "HP",           89999.0},
+            {"Lenovo ThinkPad X1 Carbon Gen 12",                   "Lenovo",      169990.0},
+            {"Lenovo ThinkPad E16 AMD Ryzen 7",                    "Lenovo",       79990.0},
+            {"Lenovo IdeaPad Slim 5 AMD Ryzen 7",                  "Lenovo",       69990.0},
+            {"Lenovo Legion 5 Pro RTX 4070 16GB",                  "Lenovo",      139990.0},
+            {"Lenovo Legion 7i Gen 9 RTX 4080",                    "Lenovo",      249990.0},
+            {"Lenovo Yoga Pro 9i Intel Core Ultra 9",              "Lenovo",      189990.0},
+            {"Asus ROG Zephyrus G16 RTX 4090",                     "Asus",        349990.0},
+            {"Asus ROG Strix G18 RTX 4080",                        "Asus",        249990.0},
+            {"Asus TUF Gaming F17 RTX 4060",                       "Asus",         89990.0},
+            {"Asus Vivobook S 15 OLED AMD Ryzen 9",                "Asus",         89990.0},
+            {"Asus Zenbook 14 OLED Intel Core Ultra 9",            "Asus",        124990.0},
+            {"Asus ProArt Studiobook 16 RTX 4070",                 "Asus",        174990.0},
+            {"Asus ROG Flow X16 RTX 4090 2-in-1",                  "Asus",        299990.0},
+            {"Acer Predator Helios Neo 16 RTX 4070",               "Acer",        129990.0},
+            {"Acer Swift X 14 AMD Ryzen 7 OLED",                   "Acer",         89990.0},
+            {"Acer Aspire 5 Intel Core i7 16GB",                   "Acer",         59990.0},
+            {"Acer Nitro 17 RTX 4070 Intel Core i7",               "Acer",        114990.0},
+            {"MSI Titan GT77 RTX 4090",                            "MSI",         399990.0},
+            {"MSI Raider GE68HX RTX 4080",                         "MSI",         299990.0},
+            {"MSI Stealth 15M RTX 4060",                           "MSI",         124990.0},
+            {"Razer Blade 16 RTX 4090 240Hz",                      "Razer",       374990.0},
+            {"Razer Blade 14 RTX 4070 144Hz",                      "Razer",       249990.0},
+            {"Microsoft Surface Laptop 5 Intel Core i7",           "Microsoft",   119990.0},
+            {"Microsoft Surface Pro 10 Intel Core Ultra 7",        "Microsoft",   139990.0},
+            {"Gigabyte AORUS Master 16 RTX 4090",                  "Gigabyte",    329990.0},
+            {"Samsung Galaxy Book4 Pro 360 Intel Core Ultra 7",    "Samsung",     149990.0},
+            {"Samsung Galaxy Book4 Ultra RTX 4070",                "Samsung",     249990.0},
+            {"LG Gram 17 Intel Core Ultra 7 Lightweight",          "LG",          149990.0},
+            {"LG Gram 16 2-in-1 Intel Core Ultra 7",               "LG",          134990.0},
+            {"HP EliteBook 840 G11 Intel Core Ultra 7",            "HP",          149990.0},
+            {"Dell Latitude 5550 Intel Core Ultra 7",              "Dell",        129990.0},
+            {"Lenovo IdeaPad Gaming 3 RTX 3050",                   "Lenovo",       65990.0},
+            {"HP Dragonfly G4 Intel Core i7 Business",             "HP",          169990.0},
+            {"Acer Chromebook 516 GE Gaming",                      "Acer",         54990.0},
+            {"Razer Book 13 Intel Core i7 2K Touch",               "Razer",       149990.0},
+        };
+
+        if (!productRepository.existsByName((String) mobiles[0][0])) {
+            List<Product> batch = new ArrayList<>(mobiles.length);
+            for (int i = 0; i < mobiles.length; i++) {
+                String name   = (String) mobiles[i][0];
+                String brand  = (String) mobiles[i][1];
+                double price  = ((Number) mobiles[i][2]).doubleValue();
+                double rating = Math.round((3.9 + rnd.nextDouble() * 1.0) * 10.0) / 10.0;
+                int reviews   = rnd.nextInt(25000) + 1000;
+                int stock     = rnd.nextInt(100) + 10;
+                String img    = "https://picsum.photos/seed/" + (imgSeed++) + "/400/400";
+                batch.add(Product.builder()
+                        .name(name).description(mDesc[i % mDesc.length]).price(price).stock(stock)
+                        .category("Mobiles").brand(brand).imageUrl(img).rating(rating).numReviews(reviews)
+                        .build());
+            }
+            productRepository.saveAll(batch);
+            System.out.println("✅ Seeded 50 premium Mobile products");
+        } else {
+            imgSeed += mobiles.length;
+        }
+
+        if (!productRepository.existsByName((String) laptops[0][0])) {
+            List<Product> batch = new ArrayList<>(laptops.length);
+            for (int i = 0; i < laptops.length; i++) {
+                String name   = (String) laptops[i][0];
+                String brand  = (String) laptops[i][1];
+                double price  = ((Number) laptops[i][2]).doubleValue();
+                double rating = Math.round((3.9 + rnd.nextDouble() * 1.0) * 10.0) / 10.0;
+                int reviews   = rnd.nextInt(20000) + 500;
+                int stock     = rnd.nextInt(80) + 5;
+                String img    = "https://picsum.photos/seed/" + (imgSeed++) + "/400/400";
+                batch.add(Product.builder()
+                        .name(name).description(lDesc[i % lDesc.length]).price(price).stock(stock)
+                        .category("Laptops").brand(brand).imageUrl(img).rating(rating).numReviews(reviews)
+                        .build());
+            }
+            productRepository.saveAll(batch);
+            System.out.println("✅ Seeded 50 premium Laptop products");
+        }
     }
 }
