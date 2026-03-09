@@ -64,6 +64,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products/*/reviews/**").permitAll()
                         // Health check - public
                         .requestMatchers("/api/health").permitAll()
+                        // Delivery check - public
+                        .requestMatchers(HttpMethod.GET, "/api/delivery/check").permitAll()
                         // Everything else requires JWT:
                         // /api/cart/**, /api/orders/**, /api/addresses/**
                         // /api/wishlist/**, POST/PUT/DELETE on reviews
